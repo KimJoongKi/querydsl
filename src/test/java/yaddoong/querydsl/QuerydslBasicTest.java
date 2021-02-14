@@ -18,13 +18,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Commit;
 import org.springframework.transaction.annotation.Transactional;
-import yaddoong.querydsl.dto.MemberDto;
-import yaddoong.querydsl.dto.QMemberDto;
-import yaddoong.querydsl.dto.UserDto;
+import yaddoong.querydsl.dto.*;
 import yaddoong.querydsl.entity.Member;
 import yaddoong.querydsl.entity.QMember;
 import yaddoong.querydsl.entity.QTeam;
 import yaddoong.querydsl.entity.Team;
+import yaddoong.querydsl.respository.MemberJpaRepository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -45,6 +44,9 @@ public class QuerydslBasicTest {
     EntityManager em;
 
     JPAQueryFactory queryFactory;
+
+    @Autowired
+    MemberJpaRepository memberJpaRepository;
 
     @BeforeEach
     public void before() {
@@ -716,6 +718,37 @@ public class QuerydslBasicTest {
         for (String s : result) {
             System.out.println("s = " + s);
         }
+    }
+
+    @Test
+    public void 검색테스트() {
+
+//        Team teamA = new Team("teamA");
+//        Team teamB = new Team("teamB");
+//        em.persist(teamA);
+//        em.persist(teamB);
+//
+//        Member member1 = new Member("member1", 10, teamA);
+//        Member member2 = new Member("member2", 20, teamA);
+//
+//        Member member3 = new Member("member3", 30, teamB);
+//        Member member4 = new Member("member4", 40, teamB);
+//
+//        em.persist(member1);
+//        em.persist(member2);
+//        em.persist(member3);
+//        em.persist(member4);
+
+        MemberSearchCondition condition = new MemberSearchCondition();
+        condition.setAgeGoe(20);
+        condition.setAgeLoe(40);
+        condition.setTeamName("teamB");
+
+        List<MemberTeamDto> result = memberJpaRepository.searchByBuilder(condition);
+
+        assertThat(result).extracting("username").containsExactly("member3","member4");
+
+
     }
 
 }
