@@ -2,11 +2,13 @@ package yaddoong.querydsl.respository;
 
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 import org.springframework.data.support.PageableExecutionUtils;
 import yaddoong.querydsl.dto.MemberSearchCondition;
 import yaddoong.querydsl.dto.MemberTeamDto;
@@ -22,6 +24,8 @@ import static yaddoong.querydsl.entity.QTeam.team;
 
 public class MemberRepositoryImpl implements MemberRepositoryCustom {
 
+
+
     private final JPAQueryFactory queryFactory;
 
     public MemberRepositoryImpl(EntityManager em) {
@@ -30,13 +34,13 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
 
     @Override
     public List<MemberTeamDto> search(MemberSearchCondition condition) {
-        return queryFactory
-                .select(new QMemberTeamDto(
-                        member.id.as("memberId"),
-                        member.username,
-                        member.age,
-                        team.id.as("teamId"),
-                        team.name.as("teamName")))
+
+        List<MemberTeamDto> fetch = queryFactory.select(new QMemberTeamDto(
+                member.id.as("memberId"),
+                member.username,
+                member.age,
+                team.id.as("teamId"),
+                team.name.as("teamName")))
                 .from(member)
                 .leftJoin(member.team, team)
                 .where(
@@ -46,6 +50,8 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
                         ageLoe(condition.getAgeLoe())
                 )
                 .fetch();
+
+        return fetch;
 
     }
 
